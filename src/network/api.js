@@ -2,7 +2,7 @@ import axios from 'axios';
 
 export const PER_PAGE = 12;
 
-export async function getImages({ page, searchValue }) {
+export const getImages = async ({ page, searchValue }) => {
   try {
     const response = await axios.get('https://pixabay.com/api/', {
       params: {
@@ -19,4 +19,4 @@ export async function getImages({ page, searchValue }) {
   } catch (error) {
     console.error(error);
   }
-}
+};

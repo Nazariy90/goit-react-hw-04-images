@@ -1,7 +1,7 @@
 import PropTypes from 'prop-types';
 import css from './ImageGalleryItem.module.css';
 
-const ImageGalleryItem = ({ image, onImageClick }) => {
+export const ImageGalleryItem = ({ image, onImageClick }) => {
   return (
     <li
       className={css.ImageGalleryItem}
@@ -23,5 +23,3 @@ ImageGalleryItem.propTypes = {
   }),
   onImageClick: PropTypes.func.isRequired,
 };
-
-export default ImageGalleryItem;

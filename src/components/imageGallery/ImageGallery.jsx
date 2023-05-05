@@ -1,49 +1,45 @@
-import { Component } from 'react';
+import { useState } from 'react';
 import PropTypes from 'prop-types';
-import ImageGalleryItem from '../imageGalleryItem/ImageGalleryItem';
+import { ImageGalleryItem } from '../imageGalleryItem/ImageGalleryItem';
 import css from './ImageGallery.module.css';
-import Modal from '../modal/Modal';
+import { Modal } from '../modal/Modal';
 
-class ImageGallery extends Component {
-  state = {
-    isOpen: false,
-    imageUrl: '',
+export const ImageGallery = ({ hits }) => {
+  const [isOpen, setisOpen] = useState(false);
+  const [imageUrl, setimageUrl] = useState('');
+
+  const handleOpenModal = imageUrl => {
+    setisOpen(true);
+    setimageUrl(imageUrl);
   };
 
-  handleOpenModal = imageUrl => {
-    this.setState({ isOpen: true, imageUrl: imageUrl });
+  const handleCloseModal = () => {
+    setisOpen(false);
+    setimageUrl('');
   };
 
-  handleCloseModal = () => {
-    this.setState({ isOpen: false, imageUrl: '' });
-  };
-
-  render() {
-    const { hits } = this.props;
-
-    return (
-      <>
-        <ul className={css.ImageGallery}>
-          {hits.map(image => (
-            <ImageGalleryItem
-              key={image.id}
-              image={image}
-              onImageClick={this.handleOpenModal}
-            />
-          ))}
-        </ul>
-
-        <Modal isOpen={this.state.isOpen} closeModal={this.handleCloseModal}>
-          <img
-            style={{ width: 500, height: 400, objectFit: 'cover' }}
-            src={this.state.imageUrl}
-            alt=""
+  return (
+    <>
+      <ul className={css.ImageGallery}>
+        {hits.map(image => (
+          <ImageGalleryItem
+            key={image.id}
+            image={image}
+            onImageClick={handleOpenModal}
           />
-        </Modal>
-      </>
-    );
-  }
-}
+        ))}
+      </ul>
+
+      <Modal isOpen={isOpen} closeModal={handleCloseModal}>
+        <img
+          style={{ width: 500, height: 400, objectFit: 'cover' }}
+          src={imageUrl}
+          alt=""
+        />
+      </Modal>
+    </>
+  );
+};
 
 ImageGallery.propTypes = {
   hits: PropTypes.arrayOf(
@@ -54,5 +50,3 @@ ImageGallery.propTypes = {
     })
   ).isRequired,
 };
-
-export default ImageGallery;

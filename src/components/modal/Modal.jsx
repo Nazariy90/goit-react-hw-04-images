@@ -19,7 +19,7 @@ const customStyles = {
 
 ReactModal.setAppElement('#modal');
 
-const Modal = ({ children, isOpen, closeModal }) => {
+export const Modal = ({ children, isOpen, closeModal }) => {
   return (
     <ReactModal
       shouldCloseOnEsc
@@ -39,5 +39,3 @@ Modal.propTypes = {
   isOpen: PropTypes.bool.isRequired,
   closeModal: PropTypes.func.isRequired,
 };
-
-export default Modal;

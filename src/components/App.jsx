@@ -1,92 +1,68 @@
-import { Component } from 'react';
-import ImageGallery from './imageGallery/ImageGallery';
-import Searchbar from './searchbar/Searchbar';
+import { useState, useEffect, useCallback } from 'react';
+import { ImageGallery } from './imageGallery/ImageGallery';
+import { Searchbar } from './searchbar/Searchbar';
 import { getImages, PER_PAGE } from '../network/api';
-import Button from './button/Button';
-import Loader from './loader/Loader';
+import { Button } from './button/Button';
+import { Loader } from './loader/Loader';
 import css from './App.module.css';
 
-export class App extends Component {
-  state = {
-    loading: false,
-    page: 1,
-    searchValue: '',
-    hits: [],
-    totalHits: 0,
-  };
+export function App() {
+  const [loading, setLoading] = useState(false);
+  const [page, setPage] = useState(1);
+  const [searchValue, setSearchValue] = useState('');
+  const [hits, setHits] = useState([]);
+  const [totalHits, setTotalHits] = useState(0);
 
-  async componentDidUpdate(prevProps, prevState) {
-    if (!this.state.searchValue) {
-      this.setState({
-        hits: [],
-        totalHits: 0,
-      });
-      return;
-    }
+  const handleLoadMore = useCallback(() => {
+    setPage(prevPage => prevPage + 1);
+  }, []);
 
-    if (
-      prevState.searchValue !== this.state.searchValue ||
-      prevState.page !== this.state.page
-    ) {
+  const handleSearch = useCallback(value => {
+    setPage(1);
+    setSearchValue(value);
+  }, []);
+
+  useEffect(() => {
+    async function fetchData() {
+      if (!searchValue) {
+        setHits([]);
+        setTotalHits(0);
+        return;
+      }
+
       try {
-        this.setState({ loading: true });
+        setLoading(true);
         const images = await getImages({
-          page: this.state.page,
-          searchValue: this.state.searchValue,
+          page,
+          searchValue,
         });
 
-        if (this.state.searchValue === prevState.searchValue) {
-          this.setState(prevValue => {
-            return {
-              hits: [...prevValue.hits, ...images.hits],
-            };
-          });
-          return;
+        if (searchValue === searchValue) {
+          setHits(prevHits => [...prevHits, ...images.hits]);
+        } else {
+          setHits(images.hits);
+          setTotalHits(images.totalHits);
         }
-
-        this.setState({
-          hits: images.hits,
-          totalHits: images.totalHits,
-        });
       } catch (error) {
         console.log(error);
       } finally {
-        this.setState({ loading: false });
+        setLoading(false);
       }
     }
-  }
 
-  handleLoadMore = () => {
-    this.setState(prev => {
-      return {
-        page: prev.page + 1,
-      };
-    });
-  };
+    fetchData();
+  }, [page, searchValue]);
 
-  handleSearch = value => {
-    this.setState({
-      page: 1,
-      searchValue: value,
-    });
-  };
+  const hasMoreImages = totalHits > 0 && page * PER_PAGE < totalHits;
 
-  render() {
-    const hasMoreImages =
-      this.state.totalHits > 0 &&
-      this.state.page * PER_PAGE < this.state.totalHits;
+  return (
+    <div className={css.AppContainer}>
+      <Searchbar onSearch={handleSearch} />
+      <ImageGallery hits={hits} />
 
-    return (
-      <div className={css.AppContainer}>
-        <Searchbar onSearch={this.handleSearch} />
-        <ImageGallery hits={this.state.hits} />
+      {loading && <Loader />}
 
-        {this.state.loading && <Loader />}
-
-        {hasMoreImages && !this.state.loading && (
-          <Button onloadMore={this.handleLoadMore} />
-        )}
-      </div>
-    );
-  }
+      {hasMoreImages && !loading && <Button onLoadMore={handleLoadMore} />}
+    </div>
+  );
 }
