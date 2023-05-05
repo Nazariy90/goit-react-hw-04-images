@@ -10,6 +10,7 @@ export function App() {
   const [loading, setLoading] = useState(false);
   const [page, setPage] = useState(1);
   const [searchValue, setSearchValue] = useState('');
+  const [prevSearchValue, setPrevSearchValue] = useState('');
   const [hits, setHits] = useState([]);
   const [totalHits, setTotalHits] = useState(0);
 
@@ -37,12 +38,13 @@ export function App() {
           searchValue,
         });
 
-        if (searchValue === searchValue) {
+        if (searchValue === prevSearchValue) {
           setHits(prevHits => [...prevHits, ...images.hits]);
         } else {
           setHits(images.hits);
           setTotalHits(images.totalHits);
         }
+        setPrevSearchValue(searchValue);
       } catch (error) {
         console.log(error);
       } finally {
@@ -51,7 +53,7 @@ export function App() {
     }
 
     fetchData();
-  }, [page, searchValue]);
+  }, [page, searchValue, prevSearchValue]);
 
   const hasMoreImages = totalHits > 0 && page * PER_PAGE < totalHits;
 
