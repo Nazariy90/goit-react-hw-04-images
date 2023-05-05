@@ -30,15 +30,13 @@ export function App() {
         setTotalHits(0);
         return;
       }
-
       try {
         setLoading(true);
         const images = await getImages({
           page,
           searchValue,
         });
-
-        if (searchValue === prevSearchValue) {
+        if (page > 1) {
           setHits(prevHits => [...prevHits, ...images.hits]);
         } else {
           setHits(images.hits);
@@ -51,7 +49,6 @@ export function App() {
         setLoading(false);
       }
     }
-
     fetchData();
   }, [page, searchValue, prevSearchValue]);
 
